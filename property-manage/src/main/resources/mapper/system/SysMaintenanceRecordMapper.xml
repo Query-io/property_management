@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysMaintenanceRecordMapper">
+
+    <resultMap type="SysMaintenanceRecord" id="SysMaintenanceRecordResult">
+        <result property="recordId" column="record_id"/>
+        <result property="facilityId" column="facility_id"/>
+        <result property="facilityCode" column="facility_code"/>
+        <result property="facilityName" column="facility_name"/>
+        <result property="maintainType" column="maintain_type"/>
+        <result property="maintainDate" column="maintain_date"/>
+        <result property="maintainContent" column="maintain_content"/>
+        <result property="maintainPerson" column="maintain_person"/>
+        <result property="maintainDept" column="maintain_dept"/>
+        <result property="cost" column="cost"/>
+        <result property="maintainResult" column="maintain_result"/>
+        <result property="nextMaintainDate" column="next_maintain_date"/>
+        <result property="attachments" column="attachments"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectMaintenanceRecordVo">
+        select record_id, facility_id, facility_code, facility_name, maintain_type, maintain_date, maintain_content,
+               maintain_person, maintain_dept, cost, maintain_result, next_maintain_date, attachments, remarks,
+               create_by, create_time, update_by, update_time
+        from sys_maintenance_record
+    </sql>
+
+    <select id="selectMaintenanceRecordList" parameterType="SysMaintenanceRecord" resultMap="SysMaintenanceRecordResult">
+        <include refid="selectMaintenanceRecordVo"/>
+        <where>
+            <if test="facilityCode != null and facilityCode != ''">
+                AND facility_code like concat('%', #{facilityCode}, '%')
+            </if>
+            <if test="facilityName != null and facilityName != ''">
+                AND facility_name like concat('%', #{facilityName}, '%')
+            </if>
+            <if test="maintainType != null and maintainType != ''">
+                AND maintain_type = #{maintainType}
+            </if>
+            <if test="maintainPerson != null and maintainPerson != ''">
+                AND maintain_person like concat('%', #{maintainPerson}, '%')
+            </if>
+            <if test="maintainDept != null and maintainDept != ''">
+                AND maintain_dept like concat('%', #{maintainDept}, '%')
+            </if>
+            <if test="maintainResult != null and maintainResult != ''">
+                AND maintain_result = #{maintainResult}
+            </if>
+            <if test="maintainDate != null">
+                AND maintain_date = #{maintainDate}
+            </if>
+        </where>
+        order by maintain_date desc
+    </select>
+
+    <select id="selectMaintenanceRecordById" parameterType="Long" resultMap="SysMaintenanceRecordResult">
+        <include refid="selectMaintenanceRecordVo"/>
+        where record_id = #{recordId}
+    </select>
+
+    <insert id="insertMaintenanceRecord" parameterType="SysMaintenanceRecord">
+        insert into sys_maintenance_record (
+        <if test="facilityId != null">facility_id,</if>
+        <if test="facilityCode != null and facilityCode != ''">facility_code,</if>
+        <if test="facilityName != null and facilityName != ''">facility_name,</if>
+        <if test="maintainType != null and maintainType != ''">maintain_type,</if>
+        <if test="maintainDate != null">maintain_date,</if>
+        <if test="maintainContent != null and maintainContent != ''">maintain_content,</if>
+        <if test="maintainPerson != null and maintainPerson != ''">maintain_person,</if>
+        <if test="maintainDept != null and maintainDept != ''">maintain_dept,</if>
+        <if test="cost != null">cost,</if>
+        <if test="maintainResult != null and maintainResult != ''">maintain_result,</if>
+        <if test="nextMaintainDate != null">next_maintain_date,</if>
+        <if test="attachments != null and attachments != ''">attachments,</if>
+        <if test="remarks != null and remarks != ''">remarks,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        ) values (
+        <if test="facilityId != null">#{facilityId},</if>
+        <if test="facilityCode != null and facilityCode != ''">#{facilityCode},</if>
+        <if test="facilityName != null and facilityName != ''">#{facilityName},</if>
+        <if test="maintainType != null and maintainType != ''">#{maintainType},</if>
+        <if test="maintainDate != null">#{maintainDate},</if>
+        <if test="maintainContent != null and maintainContent != ''">#{maintainContent},</if>
+        <if test="maintainPerson != null and maintainPerson != ''">#{maintainPerson},</if>
+        <if test="maintainDept != null and maintainDept != ''">#{maintainDept},</if>
+        <if test="cost != null">#{cost},</if>
+        <if test="maintainResult != null and maintainResult != ''">#{maintainResult},</if>
+        <if test="nextMaintainDate != null">#{nextMaintainDate},</if>
+        <if test="attachments != null and attachments != ''">#{attachments},</if>
+        <if test="remarks != null and remarks != ''">#{remarks},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <update id="updateMaintenanceRecord" parameterType="SysMaintenanceRecord">
+        update sys_maintenance_record
+        <set>
+            <if test="facilityId != null">facility_id = #{facilityId},</if>
+            <if test="facilityCode != null and facilityCode != ''">facility_code = #{facilityCode},</if>
+            <if test="facilityName != null and facilityName != ''">facility_name = #{facilityName},</if>
+            <if test="maintainType != null and maintainType != ''">maintain_type = #{maintainType},</if>
+            <if test="maintainDate != null">maintain_date = #{maintainDate},</if>
+            <if test="maintainContent != null and maintainContent != ''">maintain_content = #{maintainContent},</if>
+            <if test="maintainPerson != null and maintainPerson != ''">maintain_person = #{maintainPerson},</if>
+            <if test="maintainDept != null and maintainDept != ''">maintain_dept = #{maintainDept},</if>
+            <if test="cost != null">cost = #{cost},</if>
+            <if test="maintainResult != null and maintainResult != ''">maintain_result = #{maintainResult},</if>
+            <if test="nextMaintainDate != null">next_maintain_date = #{nextMaintainDate},</if>
+            <if test="attachments != null and attachments != ''">attachments = #{attachments},</if>
+            <if test="remarks != null and remarks != ''">remarks = #{remarks},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deleteMaintenanceRecordById" parameterType="Long">
+        delete from sys_maintenance_record where record_id = #{recordId}
+    </delete>
+
+    <delete id="deleteMaintenanceRecordByIds" parameterType="Long">
+        delete from sys_maintenance_record where record_id in
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+</mapper>

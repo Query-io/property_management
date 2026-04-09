@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.property.system.mapper.SysOwnerMapper">
+
+    <resultMap id="SysOwnerInfoMap" type="com.property.system.domain.SysOwnerInfo">
+        <id property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="dateOfBirth" column="date_of_birth"/>
+        <result property="identityNo" column="identity_no"/>
+        <result property="address" column="address"/>
+        <result property="occupation" column="occupation"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="signature" column="signature"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <!-- 查询全部 -->
+    <select id="selectOwnerList" resultMap="SysOwnerInfoMap" parameterType="sysOwnerInfo">
+        SELECT * FROM sys_owner_info
+        <where>
+            <if test="ownerName != null and ownerName != ''">
+                AND owner_name LIKE CONCAT('%', #{ownerName}, '%')
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                AND phone_number LIKE CONCAT('%', #{phoneNumber}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据 id 查询 -->
+    <select id="selectOwnerById"  resultMap="SysOwnerInfoMap">
+        SELECT * FROM sys_owner_info WHERE owner_id = #{ownerId}
+    </select>
+
+    <!-- 根据 userId 查询 -->
+    <select id="selectOwnerByUserId"  resultMap="SysOwnerInfoMap">
+        SELECT * FROM sys_owner_info WHERE user_id = #{userId}
+    </select>
+
+    <!-- 新增 -->
+    <insert id="insertOwner" parameterType="com.property.system.domain.SysOwnerInfo">
+        INSERT INTO sys_owner_info (
+            owner_name, date_of_birth, identity_no, address, occupation,
+            create_time, update_time, signature, phone_number, user_id
+        ) VALUES (
+                     #{ownerName}, #{dateOfBirth}, #{identityNo}, #{address}, #{occupation},
+                     #{createTime}, #{updateTime}, #{signature}, #{phoneNumber}, #{userId}
+                 )
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updateOwner" parameterType="com.property.system.domain.SysOwnerInfo">
+        UPDATE sys_owner_info
+        SET
+            owner_name = #{ownerName},
+            date_of_birth = #{dateOfBirth},
+            identity_no = #{identityNo},
+            address = #{address},
+            occupation = #{occupation},
+            create_time = #{createTime},
+            update_time = #{updateTime},
+            signature = #{signature},
+            phone_number = #{phoneNumber},
+            user_id = #{userId}
+        WHERE owner_id = #{ownerId}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteOwnerById" parameterType="int">
+        DELETE FROM sys_owner_info WHERE owner_id = #{ownerId}
+    </delete>
+
+</mapper>

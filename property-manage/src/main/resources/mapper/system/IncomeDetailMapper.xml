@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.IncomeDetailMapper">
+
+    <resultMap type="IncomeDetail" id="IncomeDetailResult">
+        <result property="id" column="id"/>
+        <result property="investmentId" column="investment_id"/>
+        <result property="incomeType" column="income_type"/>
+        <result property="amount" column="amount"/>
+        <result property="paymentDate" column="payment_date"/>
+        <result property="periodStart" column="period_start"/>
+        <result property="periodEnd" column="period_end"/>
+        <result property="payerName" column="payer_name"/>
+        <result property="payerPhone" column="payer_phone"/>
+        <result property="paymentMethod" column="payment_method"/>
+        <result property="invoiceNo" column="invoice_no"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="investmentTitle" column="investment_title"/>
+    </resultMap>
+
+    <sql id="selectIncomeDetailVo">
+        select d.id, d.investment_id, d.income_type, d.amount, d.payment_date, d.period_start, d.period_end, d.payer_name, d.payer_phone, d.payment_method, d.invoice_no, d.remark, d.create_time, d.create_by, d.update_time, d.update_by,
+               i.title as investment_title
+        from income_detail d
+                 left join investment_info i on d.investment_id = i.id
+    </sql>
+
+    <select id="selectIncomeDetailList" parameterType="IncomeDetail" resultMap="IncomeDetailResult">
+        <include refid="selectIncomeDetailVo"/>
+        <where>
+            <if test="investmentId != null">
+                AND d.investment_id = #{investmentId}
+            </if>
+            <if test="incomeType != null and incomeType != ''">
+                AND d.income_type = #{incomeType}
+            </if>
+            <if test="payerName != null and payerName != ''">
+                AND d.payer_name like concat('%', #{payerName}, '%')
+            </if>
+            <if test="paymentMethod != null and paymentMethod != ''">
+                AND d.payment_method = #{paymentMethod}
+            </if>
+            <if test="paymentDate != null">
+                AND date_format(d.payment_date,'%y%m%d') = date_format(#{paymentDate},'%y%m%d')
+            </if>
+        </where>
+        order by d.create_time desc
+    </select>
+
+    <select id="selectIncomeDetailById" parameterType="Long" resultMap="IncomeDetailResult">
+        <include refid="selectIncomeDetailVo"/>
+        where d.id = #{id}
+    </select>
+
+    <insert id="insertIncomeDetail" parameterType="IncomeDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into income_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="investmentId != null">investment_id,</if>
+            <if test="incomeType != null and incomeType != ''">income_type,</if>
+            <if test="amount != null">amount,</if>
+            <if test="paymentDate != null">payment_date,</if>
+            <if test="periodStart != null">period_start,</if>
+            <if test="periodEnd != null">period_end,</if>
+            <if test="payerName != null and payerName != ''">payer_name,</if>
+            <if test="payerPhone != null and payerPhone != ''">payer_phone,</if>
+            <if test="paymentMethod != null and paymentMethod != ''">payment_method,</if>
+            <if test="invoiceNo != null and invoiceNo != ''">invoice_no,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="investmentId != null">#{investmentId},</if>
+            <if test="incomeType != null and incomeType != ''">#{incomeType},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="paymentDate != null">#{paymentDate},</if>
+            <if test="periodStart != null">#{periodStart},</if>
+            <if test="periodEnd != null">#{periodEnd},</if>
+            <if test="payerName != null and payerName != ''">#{payerName},</if>
+            <if test="payerPhone != null and payerPhone != ''">#{payerPhone},</if>
+            <if test="paymentMethod != null and paymentMethod != ''">#{paymentMethod},</if>
+            <if test="invoiceNo != null and invoiceNo != ''">#{invoiceNo},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateIncomeDetail" parameterType="IncomeDetail">
+        update income_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="investmentId != null">investment_id = #{investmentId},</if>
+            <if test="incomeType != null and incomeType != ''">income_type = #{incomeType},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="paymentDate != null">payment_date = #{paymentDate},</if>
+            <if test="periodStart != null">period_start = #{periodStart},</if>
+            <if test="periodEnd != null">period_end = #{periodEnd},</if>
+            <if test="payerName != null and payerName != ''">payer_name = #{payerName},</if>
+            <if test="payerPhone != null and payerPhone != ''">payer_phone = #{payerPhone},</if>
+            <if test="paymentMethod != null and paymentMethod != ''">payment_method = #{paymentMethod},</if>
+            <if test="invoiceNo != null and invoiceNo != ''">invoice_no = #{invoiceNo},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteIncomeDetailById" parameterType="Long">
+        delete from income_detail where id = #{id}
+    </delete>
+
+    <delete id="deleteIncomeDetailByIds" parameterType="String">
+        delete from income_detail where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

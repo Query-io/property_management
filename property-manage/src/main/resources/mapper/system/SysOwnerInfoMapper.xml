@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysOwnerInfoMapper">
+
+    <!-- 定义ResultMap，明确指定映射关系 -->
+    <resultMap id="SysOwnerInfoResult" type="com.property.system.domain.SysOwnerInfo">
+        <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="dateOfBirth" column="date_of_birth"/>
+        <result property="identityNo" column="identity_no"/>
+        <result property="address" column="address"/>
+        <result property="occupation" column="occupation"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="signature" column="signature"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <!-- 根据车牌号查询车主信息 -->
+    <select id="selectOwnerByPlateNum" parameterType="String" resultMap="SysOwnerInfoResult">
+        SELECT
+            owner_id,
+            owner_name,
+            date_of_birth,
+            identity_no,
+            address,
+            occupation,
+            create_time,
+            update_time,
+            signature,
+            phone_number,
+            user_id
+        FROM sys_owner_info
+        WHERE signature = #{plateNum}
+    </select>
+
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysPropertyRepairMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="SysPropertyRepairResult" type="com.property.system.domain.SysPropertyRepair">
+        <id property="id" column="id"/>
+        <result property="propertyId" column="property_id"/>
+        <result property="propertyAddress" column="property_address"/>
+        <result property="applicantId" column="applicant_id"/>
+        <result property="applicantName" column="applicant_name"/>
+        <result property="applicantPhone" column="applicant_phone"/>
+        <result property="repairItem" column="repair_item"/>
+        <result property="repairDescription" column="repair_description"/>
+        <result property="status" column="status"/>
+        <result property="submitTime" column="submit_time"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="assigneeName" column="assignee_name"/>
+        <result property="assigneePhone" column="assignee_phone"/>
+        <result property="assignTime" column="assign_time"/>
+        <result property="completedTime" column="completed_time"/>
+        <result property="score" column="score"/>
+        <result property="comment" column="comment"/>
+        <result property="rateTime" column="rate_time"/>
+        <result property="rateBy" column="rate_by"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectSysPropertyRepairVo">
+        select
+            id, property_id, property_address, applicant_id, applicant_name, applicant_phone,
+            repair_item, repair_description, image_url, submit_time, status, assignee_name,
+            assignee_phone, assign_time, completed_time, score, comment, rate_time, rate_by,
+            create_by, create_time, update_by, update_time, remark
+        from sys_property_repair
+    </sql>
+
+    <!-- 查询列表 -->
+    <select id="selectSysPropertyRepairList" parameterType="com.property.system.domain.SysPropertyRepair" resultMap="SysPropertyRepairResult">
+        SELECT * FROM sys_property_repair
+        WHERE 1 = 1
+        <if test="propertyId != null">AND property_id = #{propertyId}</if>
+        <if test="applicantName != null and applicantName != ''">AND applicant_name LIKE CONCAT('%', #{applicantName}, '%')</if>
+        <if test="status != null and status != ''">AND status = #{status}</if>
+        <if test="repairItem != null and repairItem != ''">AND repair_item LIKE CONCAT('%', #{repairItem}, '%')</if>
+        ORDER BY submit_time DESC
+    </select>
+    <!--查询已处理的列表-->
+    <!-- 查询列表 -->
+    <select id="selectDealSysPropertyRepairList" parameterType="com.property.system.domain.SysPropertyRepair" resultMap="SysPropertyRepairResult">
+        SELECT * FROM sys_property_repair
+        WHERE status = 1
+        ORDER BY submit_time DESC
+    </select>
+
+    <!-- 查询单个维修单 -->
+    <select id="selectSysPropertyRepairById" parameterType="Long" resultMap="SysPropertyRepairResult">
+        SELECT * FROM sys_property_repair WHERE id = #{id}
+    </select>
+
+    <!-- 插入维修单 -->
+    <insert id="insertSysPropertyRepair" parameterType="com.property.system.domain.SysPropertyRepair" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_property_repair (
+            property_id, property_address, applicant_id, applicant_name,
+            applicant_phone, repair_item, repair_description, image_url,
+            status, submit_time, assignee_name, assignee_phone, assign_time, completed_time
+        ) VALUES (
+                     #{propertyId}, #{propertyAddress}, #{applicantId}, #{applicantName},
+                     #{applicantPhone}, #{repairItem}, #{repairDescription}, #{imageUrl},
+                     #{status}, NOW(), #{assigneeName}, #{assigneePhone}, #{assignTime}, #{completedTime}
+                 )
+    </insert>
+
+    <!-- 更新维修单 -->
+    <update id="updateSysPropertyRepair" parameterType="com.property.system.domain.SysPropertyRepair">
+        UPDATE sys_property_repair
+        <set>
+            <if test="propertyId != null">property_id = #{propertyId},</if>
+            <if test="propertyAddress != null">property_address = #{propertyAddress},</if>
+            <if test="applicantId != null">applicant_id = #{applicantId},</if>
+            <if test="applicantName != null">applicant_name = #{applicantName},</if>
+            <if test="applicantPhone != null">applicant_phone = #{applicantPhone},</if>
+            <if test="repairItem != null">repair_item = #{repairItem},</if>
+            <if test="repairDescription != null">repair_description = #{repairDescription},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="submitTime != null">submit_time = #{submitTime},</if>
+            <if test="assigneeName != null">assignee_name = #{assigneeName},</if>
+            <if test="assigneePhone != null">assignee_phone = #{assigneePhone},</if>
+            <if test="assignTime != null">assign_time = #{assignTime},</if>
+            <if test="completedTime != null">completed_time = #{completedTime},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateRepairRate" parameterType="SysPropertyRepair">
+        update sys_property_repair
+        set
+            score = #{score},
+            comment = #{comment},
+            rate_time = sysdate(),
+            rate_by = #{updateBy},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <!-- 删除维修单（单个） -->
+    <delete id="deleteSysPropertyRepairById" parameterType="Long">
+        DELETE FROM sys_property_repair WHERE id = #{id}
+    </delete>
+
+    <!-- 删除维修单（批量） -->
+    <delete id="deleteSysPropertyRepairByIds" parameterType="Long[]">
+        DELETE FROM sys_property_repair WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

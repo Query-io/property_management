@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.InvestmentProgressMapper">
+
+    <resultMap type="InvestmentProgress" id="InvestmentProgressResult">
+        <result property="id" column="id"/>
+        <result property="investmentId" column="investment_id"/>
+        <result property="progressType" column="progress_type"/>
+        <result property="progressDesc" column="progress_desc"/>
+        <result property="progressDate" column="progress_date"/>
+        <result property="nextPlan" column="next_plan"/>
+        <result property="trackPerson" column="track_person"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+        <result property="investmentTitle" column="investment_title"/>
+    </resultMap>
+
+    <sql id="selectInvestmentProgressVo">
+        select p.id, p.investment_id, p.progress_type, p.progress_desc, p.progress_date, p.next_plan, p.track_person, p.create_time, p.create_by, p.update_time, p.update_by, p.remark,
+               i.title as investment_title
+        from investment_progress p
+                 left join investment_info i on p.investment_id = i.id
+    </sql>
+
+    <select id="selectInvestmentProgressList" parameterType="InvestmentProgress" resultMap="InvestmentProgressResult">
+        <include refid="selectInvestmentProgressVo"/>
+        <where>
+            <if test="investmentId != null">
+                AND p.investment_id = #{investmentId}
+            </if>
+            <if test="progressType != null and progressType != ''">
+                AND p.progress_type = #{progressType}
+            </if>
+            <if test="trackPerson != null and trackPerson != ''">
+                AND p.track_person like concat('%', #{trackPerson}, '%')
+            </if>
+            <if test="progressDate != null">
+                AND date_format(p.progress_date,'%y%m%d') = date_format(#{progressDate},'%y%m%d')
+            </if>
+        </where>
+        order by p.create_time desc
+    </select>
+
+    <select id="selectInvestmentProgressById" parameterType="Long" resultMap="InvestmentProgressResult">
+        <include refid="selectInvestmentProgressVo"/>
+        where p.id = #{id}
+    </select>
+
+    <insert id="insertInvestmentProgress" parameterType="InvestmentProgress" useGeneratedKeys="true" keyProperty="id">
+        insert into investment_progress
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="investmentId != null">investment_id,</if>
+            <if test="progressType != null and progressType != ''">progress_type,</if>
+            <if test="progressDesc != null and progressDesc != ''">progress_desc,</if>
+            <if test="progressDate != null">progress_date,</if>
+            <if test="nextPlan != null and nextPlan != ''">next_plan,</if>
+            <if test="trackPerson != null and trackPerson != ''">track_person,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="investmentId != null">#{investmentId},</if>
+            <if test="progressType != null and progressType != ''">#{progressType},</if>
+            <if test="progressDesc != null and progressDesc != ''">#{progressDesc},</if>
+            <if test="progressDate != null">#{progressDate},</if>
+            <if test="nextPlan != null and nextPlan != ''">#{nextPlan},</if>
+            <if test="trackPerson != null and trackPerson != ''">#{trackPerson},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateInvestmentProgress" parameterType="InvestmentProgress">
+        update investment_progress
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="investmentId != null">investment_id = #{investmentId},</if>
+            <if test="progressType != null and progressType != ''">progress_type = #{progressType},</if>
+            <if test="progressDesc != null and progressDesc != ''">progress_desc = #{progressDesc},</if>
+            <if test="progressDate != null">progress_date = #{progressDate},</if>
+            <if test="nextPlan != null and nextPlan != ''">next_plan = #{nextPlan},</if>
+            <if test="trackPerson != null and trackPerson != ''">track_person = #{trackPerson},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteInvestmentProgressById" parameterType="Long">
+        delete from investment_progress where id = #{id}
+    </delete>
+
+    <delete id="deleteInvestmentProgressByIds" parameterType="String">
+        delete from investment_progress where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

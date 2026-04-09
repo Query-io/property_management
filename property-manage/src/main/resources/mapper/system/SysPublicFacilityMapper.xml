@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysPublicFacilityMapper">
+
+    <resultMap type="SysPublicFacility" id="SysPublicFacilityResult">
+        <result property="facilityId" column="facility_id"/>
+        <result property="facilityCode" column="facility_code"/>
+        <result property="facilityName" column="facility_name"/>
+        <result property="facilityType" column="facility_type"/>
+        <result property="location" column="location"/>
+        <result property="installDate" column="install_date"/>
+        <result property="manufacturer" column="manufacturer"/>
+        <result property="specifications" column="specifications"/>
+        <result property="status" column="status"/>
+        <result property="maintainCycle" column="maintain_cycle"/>
+        <result property="lastMaintainDate" column="last_maintain_date"/>
+        <result property="nextMaintainDate" column="next_maintain_date"/>
+        <result property="responsibilityDept" column="responsibility_dept"/>
+        <result property="responsibilityPerson" column="responsibility_person"/>
+        <result property="contactPhone" column="contact_phone"/>
+        <result property="purchasePrice" column="purchase_price"/>
+        <result property="warrantyPeriod" column="warranty_period"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectFacilityVo">
+        select facility_id, facility_code, facility_name, facility_type, location, install_date, manufacturer,
+               specifications, status, maintain_cycle, last_maintain_date, next_maintain_date, responsibility_dept,
+               responsibility_person, contact_phone, purchase_price, warranty_period, remarks, create_by, create_time,
+               update_by, update_time
+        from sys_public_facility
+    </sql>
+
+    <select id="selectFacilityList" parameterType="SysPublicFacility" resultMap="SysPublicFacilityResult">
+        <include refid="selectFacilityVo"/>
+        <where>
+            <if test="facilityCode != null and facilityCode != ''">
+                AND facility_code like concat('%', #{facilityCode}, '%')
+            </if>
+            <if test="facilityName != null and facilityName != ''">
+                AND facility_name like concat('%', #{facilityName}, '%')
+            </if>
+            <if test="facilityType != null and facilityType != ''">
+                AND facility_type = #{facilityType}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="responsibilityDept != null and responsibilityDept != ''">
+                AND responsibility_dept like concat('%', #{responsibilityDept}, '%')
+            </if>
+            <if test="location != null and location != ''">
+                AND location like concat('%', #{location}, '%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectFacilityById" parameterType="Long" resultMap="SysPublicFacilityResult">
+        <include refid="selectFacilityVo"/>
+        where facility_id = #{facilityId}
+    </select>
+
+    <insert id="insertFacility" parameterType="SysPublicFacility">
+        insert into sys_public_facility (
+        <if test="facilityCode != null and facilityCode != ''">facility_code,</if>
+        <if test="facilityName != null and facilityName != ''">facility_name,</if>
+        <if test="facilityType != null and facilityType != ''">facility_type,</if>
+        <if test="location != null and location != ''">location,</if>
+        <if test="installDate != null">install_date,</if>
+        <if test="manufacturer != null and manufacturer != ''">manufacturer,</if>
+        <if test="specifications != null and specifications != ''">specifications,</if>
+        <if test="status != null and status != ''">status,</if>
+        <if test="maintainCycle != null">maintain_cycle,</if>
+        <if test="lastMaintainDate != null">last_maintain_date,</if>
+        <if test="nextMaintainDate != null">next_maintain_date,</if>
+        <if test="responsibilityDept != null and responsibilityDept != ''">responsibility_dept,</if>
+        <if test="responsibilityPerson != null and responsibilityPerson != ''">responsibility_person,</if>
+        <if test="contactPhone != null and contactPhone != ''">contact_phone,</if>
+        <if test="purchasePrice != null">purchase_price,</if>
+        <if test="warrantyPeriod != null">warranty_period,</if>
+        <if test="remarks != null and remarks != ''">remarks,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        ) values (
+        <if test="facilityCode != null and facilityCode != ''">#{facilityCode},</if>
+        <if test="facilityName != null and facilityName != ''">#{facilityName},</if>
+        <if test="facilityType != null and facilityType != ''">#{facilityType},</if>
+        <if test="location != null and location != ''">#{location},</if>
+        <if test="installDate != null">#{installDate},</if>
+        <if test="manufacturer != null and manufacturer != ''">#{manufacturer},</if>
+        <if test="specifications != null and specifications != ''">#{specifications},</if>
+        <if test="status != null and status != ''">#{status},</if>
+        <if test="maintainCycle != null">#{maintainCycle},</if>
+        <if test="lastMaintainDate != null">#{lastMaintainDate},</if>
+        <if test="nextMaintainDate != null">#{nextMaintainDate},</if>
+        <if test="responsibilityDept != null and responsibilityDept != ''">#{responsibilityDept},</if>
+        <if test="responsibilityPerson != null and responsibilityPerson != ''">#{responsibilityPerson},</if>
+        <if test="contactPhone != null and contactPhone != ''">#{contactPhone},</if>
+        <if test="purchasePrice != null">#{purchasePrice},</if>
+        <if test="warrantyPeriod != null">#{warrantyPeriod},</if>
+        <if test="remarks != null and remarks != ''">#{remarks},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <update id="updateFacility" parameterType="SysPublicFacility">
+        update sys_public_facility
+        <set>
+            <if test="facilityCode != null and facilityCode != ''">facility_code = #{facilityCode},</if>
+            <if test="facilityName != null and facilityName != ''">facility_name = #{facilityName},</if>
+            <if test="facilityType != null and facilityType != ''">facility_type = #{facilityType},</if>
+            <if test="location != null and location != ''">location = #{location},</if>
+            <if test="installDate != null">install_date = #{installDate},</if>
+            <if test="manufacturer != null and manufacturer != ''">manufacturer = #{manufacturer},</if>
+            <if test="specifications != null and specifications != ''">specifications = #{specifications},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="maintainCycle != null">maintain_cycle = #{maintainCycle},</if>
+            <if test="lastMaintainDate != null">last_maintain_date = #{lastMaintainDate},</if>
+            <if test="nextMaintainDate != null">next_maintain_date = #{nextMaintainDate},</if>
+            <if test="responsibilityDept != null and responsibilityDept != ''">responsibility_dept = #{responsibilityDept},</if>
+            <if test="responsibilityPerson != null and responsibilityPerson != ''">responsibility_person = #{responsibilityPerson},</if>
+            <if test="contactPhone != null and contactPhone != ''">contact_phone = #{contactPhone},</if>
+            <if test="purchasePrice != null">purchase_price = #{purchasePrice},</if>
+            <if test="warrantyPeriod != null">warranty_period = #{warrantyPeriod},</if>
+            <if test="remarks != null and remarks != ''">remarks = #{remarks},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where facility_id = #{facilityId}
+    </update>
+
+    <delete id="deleteFacilityById" parameterType="Long">
+        delete from sys_public_facility where facility_id = #{facilityId}
+    </delete>
+
+    <delete id="deleteFacilityByIds" parameterType="Long">
+        delete from sys_public_facility where facility_id in
+        <foreach item="facilityId" collection="array" open="(" separator="," close=")">
+            #{facilityId}
+        </foreach>
+    </delete>
+</mapper>

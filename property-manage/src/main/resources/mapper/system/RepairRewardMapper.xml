@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.RepairRewardMapper">
+
+        <!-- 查询报修奖惩信息列表 -->
+        <select id="selectRepairRewardList" parameterType="com.property.system.domain.Repair" resultType="com.property.system.dto.RepairRewardDTO">
+            SELECT
+            r.assignee_name as workerName,
+            r.id as repairNo,
+            r.score,
+            r.comment as evaluation,
+            r.completed_time as completionTime,
+            r.repair_item as repairTitle,
+            CASE
+            WHEN r.score >= 4 THEN '1'  <!-- 奖励 -->
+            WHEN r.score &lt;= 2 THEN '2'  <!-- 惩罚 -->
+            ELSE '0'  <!-- 无奖惩 -->
+            END as rewardType,
+            CASE
+            WHEN r.score >= 4 THEN 100.00  <!-- 奖励金额 -->
+            WHEN r.score &lt;= 2 THEN -50.00  <!-- 惩罚金额 -->
+            ELSE 0.00
+            END as rewardAmount,
+            CASE
+            WHEN r.score >= 4 THEN '优秀服务奖励'
+            WHEN r.score &lt;= 2 THEN '服务质量待提升'
+            ELSE '正常服务'
+            END as remark
+            FROM sys_property_repair r
+            <where>
+                r.del_flag = '0'  <!-- 未删除的记录 -->
+                AND r.completed_time IS NOT NULL
+                AND r.score IS NOT NULL
+                <if test="workerName != null and workerName != ''">
+                    AND r.assignee_name LIKE CONCAT('%', #{workerName}, '%')
+                </if>
+                <if test="repairNo != null and repairNo != ''">
+                    AND r.id LIKE CONCAT('%', #{repairNo}, '%')
+                </if>
+                <if test="beginTime != null">
+                    AND r.completed_time &gt;= #{beginTime}
+                </if>
+                <if test="endTime != null">
+                    AND r.completed_time &lt;= #{endTime}
+                </if>
+                <if test="score != null">
+                    AND r.score = #{score}
+                </if>
+            </where>
+            ORDER BY r.completed_time DESC
+        </select>
+
+        <!-- 查询工人奖惩统计 -->
+        <select id="selectWorkerRewardStat" parameterType="java.util.Map" resultType="java.util.Map">
+            SELECT
+            r.assignee_name as workerName,
+            r.assignee_phone as phoneNumber,
+            COUNT(r.id) as completedCount,
+            ROUND(AVG(r.score), 2) as avgScore,
+            COUNT(CASE WHEN r.score >= 4 THEN 1 END) as rewardCount,
+            COUNT(CASE WHEN r.score &lt;= 2 THEN 1 END) as penaltyCount,
+            SUM(CASE WHEN r.score >= 4 THEN 100 ELSE 0 END) as totalReward,
+            SUM(CASE WHEN r.score &lt;= 2 THEN 50 ELSE 0 END) as totalPenalty,
+            (SUM(CASE WHEN r.score >= 4 THEN 100 ELSE 0 END) -
+            SUM(CASE WHEN r.score &lt;= 2 THEN 50 ELSE 0 END)) as rewardTotal
+            FROM sys_property_repair r
+            WHERE r.del_flag = '0'
+            AND r.completed_time IS NOT NULL
+            AND r.score IS NOT NULL
+            <if test="params.startTime != null and params.startTime != ''">
+                AND r.completed_time &gt;= #{params.startTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND r.completed_time &lt;= #{params.endTime}
+            </if>
+            <if test="params.workerName != null and params.workerName != ''">
+                AND r.assignee_name LIKE CONCAT('%', #{params.workerName}, '%')
+            </if>
+            GROUP BY r.assignee_name, r.assignee_phone
+            ORDER BY avgScore DESC
+        </select>
+    </mapper>

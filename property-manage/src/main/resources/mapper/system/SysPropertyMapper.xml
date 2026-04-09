@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.property.system.mapper.SysPropertyMapper">
+
+    <resultMap id="PropertyResult" type="com.property.system.domain.SysPropertyInfo">
+        <id property="propertyId" column="property_id"/>
+        <result property="propertyAddress" column="property_address"/>
+        <result property="region" column="region"/>
+        <result property="buildingNo" column="building_no"/>
+        <result property="unitNo" column="unit_no"/>
+        <result property="floor" column="floor"/>
+        <result property="roomNo" column="room_no"/>
+        <result property="buildingArea" column="building_area"/>
+        <result property="usableArea" column="usable_area"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="owner" column="owner"/>
+        <result property="managerId" column="manager_id"/>
+        <result property="manager" column="manager"/>
+        <result property="propertyType" column="property_type"/>
+        <result property="status" column="status"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <!-- 查询房产列表（联查owner、user） -->
+    <select id="selectPropertyList" parameterType="SysPropertyInfo" resultMap="PropertyResult">
+        SELECT p.*, o.owner_name AS owner, u.nick_name AS manager
+        FROM sys_property_info p
+        LEFT JOIN sys_owner_info o ON p.owner_id = o.owner_id
+        LEFT JOIN sys_user u ON p.manager_id = u.user_id
+        WHERE 1=1
+        <if test="propertyAddress != null and propertyAddress != ''">
+            AND p.property_address LIKE CONCAT('%', #{propertyAddress}, '%')
+        </if>
+        <if test="region != null and region != ''">
+            AND p.region = #{region}
+        </if>
+        <if test="status != null and status != ''">
+            AND p.status = #{status}
+        </if>
+    </select>
+    
+    <!-- 根据ownerId查询房产信息列表-->
+    
+    <select id="selectPropertyListByOwnerId"  resultMap="PropertyResult">
+        SELECT *
+        FROM sys_property_info
+        WHERE  owner_id = #{ownerId}
+    </select>
+
+
+    <!-- 根据userId查询房产信息列表-->
+    <select id="selectPropertyListByUserId"  resultMap="PropertyResult">
+        SELECT a.*
+        FROM sys_property_info a left join sys_owner_info b on a.owner_id = b.owner_id
+        WHERE  b.user_id = #{userId}
+    </select>
+
+    <!-- 查询单条房产 -->
+    <select id="selectPropertyById" parameterType="Long" resultMap="PropertyResult">
+        SELECT p.*, o.owner_name AS owner, u.nick_name AS manager
+        FROM sys_property_info p
+                 LEFT JOIN sys_owner_info o ON p.owner_id = o.owner_id
+                 LEFT JOIN sys_user u ON p.manager_id = u.user_id
+        WHERE p.property_id = #{propertyId}
+    </select>
+
+    <!-- 新增 -->
+    <insert id="insertProperty" parameterType="SysPropertyInfo" useGeneratedKeys="true" keyProperty="propertyId">
+        INSERT INTO sys_property_info (
+            property_address, region, building_no, unit_no, floor, room_no,
+            building_area, usable_area, owner_id, owner, manager_id, manager,
+            property_type, status, image_url, create_time, remark
+        ) VALUES (
+                     #{propertyAddress}, #{region}, #{buildingNo}, #{unitNo}, #{floor}, #{roomNo},
+                     #{buildingArea}, #{usableArea}, #{ownerId}, #{owner}, #{managerId}, #{manager},
+                     #{propertyType}, #{status}, #{imageUrl}, NOW(), #{remark}
+                 )
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateProperty" parameterType="SysPropertyInfo">
+        UPDATE sys_property_info
+        <set>
+            <if test="propertyAddress != null">property_address = #{propertyAddress},</if>
+            <if test="region != null">region = #{region},</if>
+            <if test="buildingNo != null">building_no = #{buildingNo},</if>
+            <if test="unitNo != null">unit_no = #{unitNo},</if>
+            <if test="floor != null">floor = #{floor},</if>
+            <if test="roomNo != null">room_no = #{roomNo},</if>
+            <if test="buildingArea != null">building_area = #{buildingArea},</if>
+            <if test="usableArea != null">usable_area = #{usableArea},</if>
+            <if test="ownerId != null">owner_id = #{ownerId},</if>
+            <if test="owner != null">owner = #{owner},</if>
+            <if test="managerId != null">manager_id = #{managerId},</if>
+            <if test="manager != null">manager = #{manager},</if>
+            <if test="propertyType != null">property_type = #{propertyType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE property_id = #{propertyId}
+    </update>
+
+    <!-- 修改状态 -->
+    <update id="updatePropertyStatus">
+        UPDATE sys_property_info
+        SET status = #{status}, update_time = NOW()
+        WHERE property_id = #{propertyId}
+    </update>
+
+    <!-- 修改业主 -->
+    <update id="updatePropertyOwner" parameterType="SysPropertyInfo">
+        UPDATE sys_property_info
+        SET owner_id = #{ownerId}, owner = #{owner}, update_time = NOW(),manager_id=#{managerId}, manager=#{manager}
+        WHERE property_id = #{propertyId}
+    </update>
+
+    <!-- 删除房产信息 -->
+    <delete id="deletePropertyById" parameterType="long">
+        DELETE FROM sys_property_info WHERE property_id = #{propertyId}
+    </delete>
+
+    <!-- 单独更新房产图片地址 -->
+    <update id="updatePropertyImageUrl">
+        UPDATE sys_property_info
+        SET image_url = #{imageUrl},
+            update_time = NOW()
+        WHERE property_id = #{propertyId}
+    </update>
+</mapper>

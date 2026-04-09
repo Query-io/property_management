@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysParkInfoMapper">
+
+    <resultMap type="SysParkInfo" id="SysParkInfoResult">
+        <result property="parkId"       column="park_id"        />
+        <result property="parkAmount"   column="park_amount"    />
+        <result property="parkSpare"    column="park_spare"     />
+        <result property="parkAddress"  column="park_address"   />
+        <result property="parkName"     column="park_name"      />
+        <result property="parkRule"     column="park_rule"      />
+        <result property="parkPic"      column="park_pic"       />
+        <result property="delFlag"      column="del_flag"       />
+        <result property="remark"       column="remark"         />
+        <result property="createBy"     column="create_by"      />
+        <result property="createTime"   column="create_time"    />
+    </resultMap>
+
+    <sql id="selectParkInfoVo">
+        select park_id, park_amount, park_spare, park_address, park_name, park_rule, park_pic, del_flag, remark, create_by, create_time
+        from sys_park_info
+    </sql>
+
+    <!-- 查询所有停车场信息（分页） -->
+    <select id="selectParkInfoList" parameterType="SysParkInfo" resultMap="SysParkInfoResult">
+        <include refid="selectParkInfoVo"/>
+        <where>
+            <if test="delFlag != null and delFlag != ''">
+                AND del_flag = #{delFlag}
+            </if>
+            <if test="parkName != null and parkName != ''">
+                AND park_name like concat('%', #{parkName}, '%')
+            </if>
+            <if test="parkAddress != null and parkAddress != ''">
+                AND park_address like concat('%', #{parkAddress}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询未删除的停车场信息（不分页） -->
+    <select id="selectActiveParkInfoList" resultMap="SysParkInfoResult">
+        <include refid="selectParkInfoVo"/>
+        <where>
+            del_flag = '0'
+        </where>
+    </select>
+
+    <!-- 根据ID查询停车场信息 -->
+    <select id="selectParkInfoById" parameterType="Long" resultMap="SysParkInfoResult">
+        <include refid="selectParkInfoVo"/>
+        where park_id = #{parkId}
+    </select>
+
+    <!-- 新增停车场信息 -->
+    <insert id="insertParkInfo" parameterType="SysParkInfo">
+        insert into sys_park_info (
+            park_amount, park_spare, park_address, park_name, park_rule, park_pic, del_flag, remark, create_by, create_time
+        ) values (
+                     #{parkAmount}, #{parkSpare}, #{parkAddress}, #{parkName}, #{parkRule}, #{parkPic}, #{delFlag}, #{remark}, #{createBy}, sysdate()
+                 )
+    </insert>
+
+    <!-- 更新停车场信息 -->
+    <update id="updateParkInfo" parameterType="SysParkInfo">
+        update sys_park_info
+        <set>
+            <if test="parkAmount != null">park_amount = #{parkAmount},</if>
+            <if test="parkSpare != null">park_spare = #{parkSpare},</if>
+            <if test="parkAddress != null">park_address = #{parkAddress},</if>
+            <if test="parkName != null">park_name = #{parkName},</if>
+            <if test="parkRule != null">park_rule = #{parkRule},</if>
+            <if test="parkPic != null">park_pic = #{parkPic},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+        </set>
+        where park_id = #{parkId}
+    </update>
+
+    <!-- 删除停车场信息（通过ID） -->
+    <delete id="deleteParkInfoById" parameterType="Long">
+        delete from sys_park_info where park_id = #{parkId}
+    </delete>
+
+    <!-- 批量删除停车场信息 -->
+    <delete id="deleteParkInfoByIds" parameterType="List">
+        delete from sys_park_info where park_id in
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

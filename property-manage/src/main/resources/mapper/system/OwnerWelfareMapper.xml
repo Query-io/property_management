@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.OwnerWelfareMapper">
+
+    <resultMap type="OwnerWelfare" id="OwnerWelfareResult">
+        <result property="id" column="id"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="roomNo" column="room_no"/>
+        <result property="welfareType" column="welfare_type"/>
+        <result property="welfareName" column="welfare_name"/>
+        <result property="welfareDesc" column="welfare_desc"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="receiveTime" column="receive_time"/>
+        <result property="receiveMethod" column="receive_method"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+    <sql id="selectOwnerWelfareVo">
+        select id, owner_id, owner_name, room_no, welfare_type, welfare_name, welfare_desc, apply_time, receive_time, receive_method, status, remark, create_time, create_by, update_time, update_by from owner_welfare
+    </sql>
+
+    <select id="selectOwnerWelfareList" parameterType="OwnerWelfare" resultMap="OwnerWelfareResult">
+        <include refid="selectOwnerWelfareVo"/>
+        <where>
+            <if test="ownerName != null and ownerName != ''">
+                AND owner_name like concat('%', #{ownerName}, '%')
+            </if>
+            <if test="roomNo != null and roomNo != ''">
+                AND room_no like concat('%', #{roomNo}, '%')
+            </if>
+            <if test="welfareType != null and welfareType != ''">
+                AND welfare_type = #{welfareType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="receiveMethod != null and receiveMethod != ''">
+                AND receive_method = #{receiveMethod}
+            </if>
+            <if test="applyTime != null">
+                AND date_format(apply_time,'%y%m%d') = date_format(#{applyTime},'%y%m%d')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectOwnerWelfareById" parameterType="Long" resultMap="OwnerWelfareResult">
+        <include refid="selectOwnerWelfareVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertOwnerWelfare" parameterType="OwnerWelfare" useGeneratedKeys="true" keyProperty="id">
+        insert into owner_welfare
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null">owner_id,</if>
+            <if test="ownerName != null and ownerName != ''">owner_name,</if>
+            <if test="roomNo != null and roomNo != ''">room_no,</if>
+            <if test="welfareType != null and welfareType != ''">welfare_type,</if>
+            <if test="welfareName != null and welfareName != ''">welfare_name,</if>
+            <if test="welfareDesc != null and welfareDesc != ''">welfare_desc,</if>
+            <if test="applyTime != null">apply_time,</if>
+            <if test="receiveTime != null">receive_time,</if>
+            <if test="receiveMethod != null and receiveMethod != ''">receive_method,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null">#{ownerId},</if>
+            <if test="ownerName != null and ownerName != ''">#{ownerName},</if>
+            <if test="roomNo != null and roomNo != ''">#{roomNo},</if>
+            <if test="welfareType != null and welfareType != ''">#{welfareType},</if>
+            <if test="welfareName != null and welfareName != ''">#{welfareName},</if>
+            <if test="welfareDesc != null and welfareDesc != ''">#{welfareDesc},</if>
+            <if test="applyTime != null">#{applyTime},</if>
+            <if test="receiveTime != null">#{receiveTime},</if>
+            <if test="receiveMethod != null and receiveMethod != ''">#{receiveMethod},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOwnerWelfare" parameterType="OwnerWelfare">
+        update owner_welfare
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ownerId != null">owner_id = #{ownerId},</if>
+            <if test="ownerName != null and ownerName != ''">owner_name = #{ownerName},</if>
+            <if test="roomNo != null and roomNo != ''">room_no = #{roomNo},</if>
+            <if test="welfareType != null and welfareType != ''">welfare_type = #{welfareType},</if>
+            <if test="welfareName != null and welfareName != ''">welfare_name = #{welfareName},</if>
+            <if test="welfareDesc != null and welfareDesc != ''">welfare_desc = #{welfareDesc},</if>
+            <if test="applyTime != null">apply_time = #{applyTime},</if>
+            <if test="receiveTime != null">receive_time = #{receiveTime},</if>
+            <if test="receiveMethod != null and receiveMethod != ''">receive_method = #{receiveMethod},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOwnerWelfareById" parameterType="Long">
+        delete from owner_welfare where id = #{id}
+    </delete>
+
+    <delete id="deleteOwnerWelfareByIds" parameterType="String">
+        delete from owner_welfare where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

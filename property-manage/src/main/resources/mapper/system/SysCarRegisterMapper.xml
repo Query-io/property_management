@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysCarRegisterMapper">
+
+    <resultMap type="SysCarRegister" id="SysCarRegisterResult">
+        <result property="carId" column="car_id"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="plateNumber" column="plate_number"/>
+        <result property="carBrand" column="car_brand"/>
+        <result property="carModel" column="car_model"/>
+        <result property="carColor" column="car_color"/>
+        <result property="parkingSpace" column="parking_space"/>
+        <result property="registerDate" column="register_date"/>
+        <result property="expireDate" column="expire_date"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <!-- 关联查询字段 -->
+        <result property="phoneNumber" column="phone_number"/>
+    </resultMap>
+
+    <sql id="selectSysCarRegisterVo">
+        select c.car_id,
+               c.owner_id,
+               c.owner_name,
+               c.plate_number,
+               c.car_brand,
+               c.car_model,
+               c.car_color,
+               c.parking_space,
+               c.register_date,
+               c.expire_date,
+               c.status,
+               c.remark,
+               c.create_time,
+               c.update_time,
+               c.create_by,
+               c.update_by,
+               o.phone_number
+        from sys_car_register c
+                 left join sys_owner_info o on c.owner_id = o.owner_id
+    </sql>
+
+    <select id="selectSysCarRegisterByCarId" parameterType="Long" resultMap="SysCarRegisterResult">
+        <include refid="selectSysCarRegisterVo"/>
+        where c.car_id = #{carId}
+    </select>
+
+    <select id="selectSysCarRegisterList" parameterType="SysCarRegister" resultMap="SysCarRegisterResult">
+        <include refid="selectSysCarRegisterVo"/>
+        <where>
+            <if test="ownerName != null  and ownerName != ''">and c.owner_name like concat('%', #{ownerName}, '%')</if>
+            <if test="ownerId != null ">and c.owner_id = #{ownerId}</if>
+            <if test="plateNumber != null  and plateNumber != ''">and c.plate_number like concat('%', #{plateNumber},
+                '%')
+            </if>
+            <if test="carBrand != null  and carBrand != ''">and c.car_brand like concat('%', #{carBrand}, '%')</if>
+            <if test="parkingSpace != null  and parkingSpace != ''">and c.parking_space like concat('%',
+                #{parkingSpace}, '%')
+            </if>
+            <if test="status != null  and status != ''">and c.status = #{status}</if>
+            <if test="phoneNumber != null  and phoneNumber != ''">and o.phone_number like concat('%', #{phoneNumber},
+                '%')
+            </if>
+        </where>
+        order by c.register_date desc
+    </select>
+
+    <select id="selectSysCarRegisterByPlateNumber" parameterType="String" resultMap="SysCarRegisterResult">
+        <include refid="selectSysCarRegisterVo"/>
+        where c.plate_number = #{plateNumber}
+    </select>
+
+    <insert id="insertSysCarRegister" parameterType="SysCarRegister" useGeneratedKeys="true" keyProperty="carId">
+        insert into sys_car_register
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null">owner_id,</if>
+            <if test="ownerName != null">owner_name,</if>
+            <if test="plateNumber != null">plate_number,</if>
+            <if test="carBrand != null">car_brand,</if>
+            <if test="carModel != null">car_model,</if>
+            <if test="carColor != null">car_color,</if>
+            <if test="parkingSpace != null">parking_space,</if>
+            <if test="registerDate != null">register_date,</if>
+            <if test="expireDate != null">expire_date,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null">#{ownerId},</if>
+            <if test="ownerName != null">#{ownerName},</if>
+            <if test="plateNumber != null">#{plateNumber},</if>
+            <if test="carBrand != null">#{carBrand},</if>
+            <if test="carModel != null">#{carModel},</if>
+            <if test="carColor != null">#{carColor},</if>
+            <if test="parkingSpace != null">#{parkingSpace},</if>
+            <if test="registerDate != null">#{registerDate},</if>
+            <if test="expireDate != null">#{expireDate},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysCarRegister" parameterType="SysCarRegister">
+        update sys_car_register
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ownerId != null">owner_id = #{ownerId},</if>
+            <if test="ownerName != null">owner_name = #{ownerName},</if>
+            <if test="plateNumber != null">plate_number = #{plateNumber},</if>
+            <if test="carBrand != null">car_brand = #{carBrand},</if>
+            <if test="carModel != null">car_model = #{carModel},</if>
+            <if test="carColor != null">car_color = #{carColor},</if>
+            <if test="parkingSpace != null">parking_space = #{parkingSpace},</if>
+            <if test="registerDate != null">register_date = #{registerDate},</if>
+            <if test="expireDate != null">expire_date = #{expireDate},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+        </trim>
+        where car_id = #{carId}
+    </update>
+
+    <delete id="deleteSysCarRegisterByCarId" parameterType="Long">
+        delete
+        from sys_car_register
+        where car_id = #{carId}
+    </delete>
+
+    <delete id="deleteSysCarRegisterByCarIds" parameterType="String">
+        delete from sys_car_register where car_id in
+        <foreach item="carId" collection="array" open="(" separator="," close=")">
+            #{carId}
+        </foreach>
+    </delete>
+</mapper>

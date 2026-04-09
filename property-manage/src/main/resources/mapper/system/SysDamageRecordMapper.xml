@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysDamageRecordMapper">
+
+    <resultMap type="SysDamageRecord" id="SysDamageRecordResult">
+        <result property="damageId" column="damage_id"/>
+        <result property="facilityId" column="facility_id"/>
+        <result property="facilityCode" column="facility_code"/>
+        <result property="facilityName" column="facility_name"/>
+        <result property="damageDate" column="damage_date"/>
+        <result property="damageType" column="damage_type"/>
+        <result property="damageDescription" column="damage_description"/>
+        <result property="reporter" column="reporter"/>
+        <result property="reporterPhone" column="reporter_phone"/>
+        <result property="handleStatus" column="handle_status"/>
+        <result property="handleMethod" column="handle_method"/>
+        <result property="handlePerson" column="handle_person"/>
+        <result property="handleDate" column="handle_date"/>
+        <result property="handleResult" column="handle_result"/>
+        <result property="attachments" column="attachments"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectDamageRecordVo">
+        select damage_id, facility_id, facility_code, facility_name, damage_date, damage_type, damage_description,
+               reporter, reporter_phone, handle_status, handle_method, handle_person, handle_date, handle_result,
+               attachments, remarks, create_by, create_time, update_by, update_time
+        from sys_damage_record
+    </sql>
+
+    <select id="selectDamageRecordList" parameterType="SysDamageRecord" resultMap="SysDamageRecordResult">
+        <include refid="selectDamageRecordVo"/>
+        <where>
+            <if test="facilityCode != null and facilityCode != ''">
+                AND facility_code like concat('%', #{facilityCode}, '%')
+            </if>
+            <if test="facilityName != null and facilityName != ''">
+                AND facility_name like concat('%', #{facilityName}, '%')
+            </if>
+            <if test="damageType != null and damageType != ''">
+                AND damage_type = #{damageType}
+            </if>
+            <if test="handleStatus != null and handleStatus != ''">
+                AND handle_status = #{handleStatus}
+            </if>
+            <if test="handleMethod != null and handleMethod != ''">
+                AND handle_method = #{handleMethod}
+            </if>
+            <if test="reporter != null and reporter != ''">
+                AND reporter like concat('%', #{reporter}, '%')
+            </if>
+            <if test="handlePerson != null and handlePerson != ''">
+                AND handle_person like concat('%', #{handlePerson}, '%')
+            </if>
+            <if test="damageDate != null">
+                AND damage_date = #{damageDate}
+            </if>
+        </where>
+        order by damage_date desc
+    </select>
+
+    <select id="selectDamageRecordById" parameterType="Long" resultMap="SysDamageRecordResult">
+        <include refid="selectDamageRecordVo"/>
+        where damage_id = #{damageId}
+    </select>
+
+    <insert id="insertDamageRecord" parameterType="SysDamageRecord">
+        insert into sys_damage_record (
+        <if test="facilityId != null">facility_id,</if>
+        <if test="facilityCode != null and facilityCode != ''">facility_code,</if>
+        <if test="facilityName != null and facilityName != ''">facility_name,</if>
+        <if test="damageDate != null">damage_date,</if>
+        <if test="damageType != null and damageType != ''">damage_type,</if>
+        <if test="damageDescription != null and damageDescription != ''">damage_description,</if>
+        <if test="reporter != null and reporter != ''">reporter,</if>
+        <if test="reporterPhone != null and reporterPhone != ''">reporter_phone,</if>
+        <if test="handleStatus != null and handleStatus != ''">handle_status,</if>
+        <if test="handleMethod != null and handleMethod != ''">handle_method,</if>
+        <if test="handlePerson != null and handlePerson != ''">handle_person,</if>
+        <if test="handleDate != null">handle_date,</if>
+        <if test="handleResult != null and handleResult != ''">handle_result,</if>
+        <if test="attachments != null and attachments != ''">attachments,</if>
+        <if test="remarks != null and remarks != ''">remarks,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        ) values (
+        <if test="facilityId != null">#{facilityId},</if>
+        <if test="facilityCode != null and facilityCode != ''">#{facilityCode},</if>
+        <if test="facilityName != null and facilityName != ''">#{facilityName},</if>
+        <if test="damageDate != null">#{damageDate},</if>
+        <if test="damageType != null and damageType != ''">#{damageType},</if>
+        <if test="damageDescription != null and damageDescription != ''">#{damageDescription},</if>
+        <if test="reporter != null and reporter != ''">#{reporter},</if>
+        <if test="reporterPhone != null and reporterPhone != ''">#{reporterPhone},</if>
+        <if test="handleStatus != null and handleStatus != ''">#{handleStatus},</if>
+        <if test="handleMethod != null and handleMethod != ''">#{handleMethod},</if>
+        <if test="handlePerson != null and handlePerson != ''">#{handlePerson},</if>
+        <if test="handleDate != null">#{handleDate},</if>
+        <if test="handleResult != null and handleResult != ''">#{handleResult},</if>
+        <if test="attachments != null and attachments != ''">#{attachments},</if>
+        <if test="remarks != null and remarks != ''">#{remarks},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <update id="updateDamageRecord" parameterType="SysDamageRecord">
+        update sys_damage_record
+        <set>
+            <if test="facilityId != null">facility_id = #{facilityId},</if>
+            <if test="facilityCode != null and facilityCode != ''">facility_code = #{facilityCode},</if>
+            <if test="facilityName != null and facilityName != ''">facility_name = #{facilityName},</if>
+            <if test="damageDate != null">damage_date = #{damageDate},</if>
+            <if test="damageType != null and damageType != ''">damage_type = #{damageType},</if>
+            <if test="damageDescription != null and damageDescription != ''">damage_description = #{damageDescription},</if>
+            <if test="reporter != null and reporter != ''">reporter = #{reporter},</if>
+            <if test="reporterPhone != null and reporterPhone != ''">reporter_phone = #{reporterPhone},</if>
+            <if test="handleStatus != null and handleStatus != ''">handle_status = #{handleStatus},</if>
+            <if test="handleMethod != null and handleMethod != ''">handle_method = #{handleMethod},</if>
+            <if test="handlePerson != null and handlePerson != ''">handle_person = #{handlePerson},</if>
+            <if test="handleDate != null">handle_date = #{handleDate},</if>
+            <if test="handleResult != null and handleResult != ''">handle_result = #{handleResult},</if>
+            <if test="attachments != null and attachments != ''">attachments = #{attachments},</if>
+            <if test="remarks != null and remarks != ''">remarks = #{remarks},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where damage_id = #{damageId}
+    </update>
+
+    <delete id="deleteDamageRecordById" parameterType="Long">
+        delete from sys_damage_record where damage_id = #{damageId}
+    </delete>
+
+    <delete id="deleteDamageRecordByIds" parameterType="Long">
+        delete from sys_damage_record where damage_id in
+        <foreach item="damageId" collection="array" open="(" separator="," close=")">
+            #{damageId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.OwnerPointsHistoryMapper">
+
+    <resultMap type="OwnerPointsHistory" id="OwnerPointsHistoryResult">
+        <result property="historyId" column="history_id"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="oldPoints" column="old_points"/>
+        <result property="newPoints" column="new_points"/>
+        <result property="adjustPoints" column="adjust_points"/>
+        <result property="adjustType" column="adjust_type"/>
+        <result property="reason" column="reason"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="ownerName" column="owner_name"/>
+    </resultMap>
+
+    <sql id="selectOwnerPointsHistoryVo">
+        select h.*, o.owner_name
+        from owner_points_history h
+                 left join sys_owner_info o on h.owner_id = o.owner_id
+    </sql>
+
+    <select id="selectOwnerPointsHistoryList" parameterType="OwnerPointsHistory" resultMap="OwnerPointsHistoryResult">
+        <include refid="selectOwnerPointsHistoryVo"/>
+        <where>
+            <if test="ownerId != null"> and h.owner_id = #{ownerId}</if>
+            <if test="userId != null"> and h.user_id = #{userId}</if>
+            <if test="ownerName != null and ownerName != ''">
+                and o.owner_name like concat('%', #{ownerName}, '%')
+            </if>
+            <if test="adjustType != null and adjustType != ''">
+                and h.adjust_type = #{adjustType}
+            </if>
+        </where>
+        order by h.create_time desc
+    </select>
+
+    <select id="selectHistoryByOwnerId" parameterType="Long" resultMap="OwnerPointsHistoryResult">
+        <include refid="selectOwnerPointsHistoryVo"/>
+        where h.owner_id = #{ownerId}
+        order by h.create_time desc
+    </select>
+
+    <select id="selectHistoryByUserId" parameterType="Long" resultMap="OwnerPointsHistoryResult">
+        <include refid="selectOwnerPointsHistoryVo"/>
+        where h.user_id = #{userId}
+        order by h.create_time desc
+    </select>
+
+    <insert id="insertOwnerPointsHistory" parameterType="OwnerPointsHistory" useGeneratedKeys="true" keyProperty="historyId">
+        insert into owner_points_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null">owner_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="oldPoints != null">old_points,</if>
+            <if test="newPoints != null">new_points,</if>
+            <if test="adjustPoints != null">adjust_points,</if>
+            <if test="adjustType != null and adjustType != ''">adjust_type,</if>
+            <if test="reason != null and reason != ''">reason,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null">#{ownerId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="oldPoints != null">#{oldPoints},</if>
+            <if test="newPoints != null">#{newPoints},</if>
+            <if test="adjustPoints != null">#{adjustPoints},</if>
+            <if test="adjustType != null and adjustType != ''">#{adjustType},</if>
+            <if test="reason != null and reason != ''">#{reason},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+</mapper>

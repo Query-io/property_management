@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysCarScanMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="SysCarScanMap" type="com.property.system.domain.SysCarScan">
+        <id property="scanId" column="scan_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="parkId" column="park_id"/>
+        <result property="plateColor" column="plate_color"/>
+        <result property="plateNum" column="plate_num"/>
+        <result property="type" column="type"/>
+        <result property="direction" column="direction"/>
+        <result property="picture" column="picture"/>
+        <result property="createTime" column="create_time"/>
+        <result property="userName"       column="user_name"/>
+        <result property="parkName"        column="park_name"/>
+    </resultMap>
+
+    <!-- 查询车牌扫描记录，传入 SysCarScan 实体类 -->
+    <select id="selectCarScanList" resultMap="SysCarScanMap" parameterType="com.property.system.domain.SysCarScan">
+        SELECT cs.*,su.user_name, pi.park_name FROM sys_car_scan cs
+        LEFT JOIN  sys_user su on cs.user_id = su.user_id
+        LEFT JOIN  sys_park_info pi on pi.park_id = cs.park_id
+        <where>
+            <if test="userId != null">AND cs.user_id = #{userId}</if>
+            <if test="plateNum != null and plateNum != ''">AND cs.plate_num LIKE CONCAT('%', #{plateNum}, '%')</if>
+            <if test="parkId != null">AND park_id = #{parkId}</if>
+            <if test="plateColor != null and plateColor != ''">
+                AND cs.plate_color LIKE CONCAT('%', #{plateColor}, '%')
+            </if>
+            <if test="type != null">AND cs.type = #{type}</if>
+            <if test="direction != null">AND direction = #{direction}</if>
+        </where>
+    </select>
+
+    <!-- 根据 scan_id 查询车牌扫描记录 -->
+    <select id="selectCarScanById" resultMap="SysCarScanMap">
+        SELECT * FROM sys_car_scan WHERE scan_id = #{scanId}
+    </select>
+
+    <!-- 根据 userId 查询车牌扫描记录 -->
+    <select id="selectCarScanByUserId" resultMap="SysCarScanMap">
+        SELECT cs.*,su.user_name, pi.park_name FROM sys_car_scan cs
+        LEFT JOIN  sys_user su on cs.user_id = su.user_id
+        LEFT JOIN  sys_park_info pi on pi.park_id = cs.park_id
+        where cs.user_id = #{userId}
+    </select>
+
+    <!-- 插入车牌扫描记录 -->
+    <insert id="insertCarScan" parameterType="com.property.system.domain.SysCarScan">
+        INSERT INTO sys_car_scan (user_id, park_id, plate_color, plate_num, type, direction, picture, create_time)
+        VALUES (#{userId}, #{parkId}, #{plateColor}, #{plateNum}, #{type}, #{direction}, #{picture}, #{createTime})
+    </insert>
+
+    <!-- 更新车牌扫描记录，只更新不为空的字段 -->
+    <update id="updateCarScan" parameterType="com.property.system.domain.SysCarScan">
+        UPDATE sys_car_scan
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="parkId != null">park_id = #{parkId},</if>
+            <if test="plateColor != null">plate_color = #{plateColor},</if>
+            <if test="plateNum != null">plate_num = #{plateNum},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="direction != null">direction = #{direction},</if>
+            <if test="picture != null">picture = #{picture},</if>
+            <if test="createTime != null">create_time = #{createTime}</if>
+        </set>
+        WHERE scan_id = #{scanId}
+    </update>
+
+    <!-- 删除车牌扫描记录 -->
+    <delete id="deleteCarScanById" parameterType="long">
+        DELETE FROM sys_car_scan WHERE scan_id = #{scanId}
+    </delete>
+
+</mapper>

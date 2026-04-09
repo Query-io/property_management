@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.WorkerMapper">
+
+    <resultMap type="Worker" id="WorkerResult">
+        <result property="workerId" column="worker_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="workerName" column="worker_name"/>
+        <result property="gender" column="gender"/>
+        <result property="age" column="age"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="idCard" column="id_card"/>
+        <result property="address" column="address"/>
+        <result property="workerType" column="worker_type"/>
+        <result property="entryDate" column="entry_date"/>
+        <result property="workStatus" column="work_status"/>
+        <result property="emergencyContact" column="emergency_contact"/>
+        <result property="emergencyPhone" column="emergency_phone"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectWorkerVo">
+        select
+            worker_id,
+            user_id,
+            worker_name,
+            gender,
+            age,
+            phone_number,
+            id_card,
+            address,
+            worker_type,
+            entry_date,
+            work_status,
+            emergency_contact,
+            emergency_phone,
+            remark,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        from sys_worker
+    </sql>
+
+    <select id="selectWorkerById" parameterType="Long" resultMap="WorkerResult">
+        <include refid="selectWorkerVo"/>
+        where worker_id = #{workerId}
+    </select>
+
+    <select id="selectWorkerByUserId" parameterType="Long" resultMap="WorkerResult">
+        <include refid="selectWorkerVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <select id="selectWorkerList" parameterType="Worker" resultMap="WorkerResult">
+        <include refid="selectWorkerVo"/>
+        <where>
+            <if test="workerName != null and workerName != ''">
+                AND worker_name like concat('%', #{workerName}, '%')
+            </if>
+            <if test="gender != null and gender != ''">
+                AND gender = #{gender}
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                AND phone_number like concat('%', #{phoneNumber}, '%')
+            </if>
+            <if test="workerType != null and workerType != ''">
+                AND worker_type = #{workerType}
+            </if>
+            <if test="workStatus != null and workStatus != ''">
+                AND work_status = #{workStatus}
+            </if>
+            <if test="address != null and address != ''">
+                AND address like concat('%', #{address}, '%')
+            </if>
+            <if test="idCard != null and idCard != ''">
+                AND id_card like concat('%', #{idCard}, '%')
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insertWorker" parameterType="Worker" useGeneratedKeys="true" keyProperty="workerId">
+        insert into sys_worker
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="workerName != null and workerName != ''">worker_name,</if>
+            <if test="gender != null and gender != ''">gender,</if>
+            <if test="age != null">age,</if>
+            <if test="phoneNumber != null and phoneNumber != ''">phone_number,</if>
+            <if test="idCard != null and idCard != ''">id_card,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="workerType != null and workerType != ''">worker_type,</if>
+            <if test="entryDate != null">entry_date,</if>
+            <if test="workStatus != null and workStatus != ''">work_status,</if>
+            <if test="emergencyContact != null and emergencyContact != ''">emergency_contact,</if>
+            <if test="emergencyPhone != null and emergencyPhone != ''">emergency_phone,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="workerName != null and workerName != ''">#{workerName},</if>
+            <if test="gender != null and gender != ''">#{gender},</if>
+            <if test="age != null">#{age},</if>
+            <if test="phoneNumber != null and phoneNumber != ''">#{phoneNumber},</if>
+            <if test="idCard != null and idCard != ''">#{idCard},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="workerType != null and workerType != ''">#{workerType},</if>
+            <if test="entryDate != null">#{entryDate},</if>
+            <if test="workStatus != null and workStatus != ''">#{workStatus},</if>
+            <if test="emergencyContact != null and emergencyContact != ''">#{emergencyContact},</if>
+            <if test="emergencyPhone != null and emergencyPhone != ''">#{emergencyPhone},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateWorker" parameterType="Worker">
+        update sys_worker
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="workerName != null and workerName != ''">worker_name = #{workerName},</if>
+            <if test="gender != null and gender != ''">gender = #{gender},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="phoneNumber != null and phoneNumber != ''">phone_number = #{phoneNumber},</if>
+            <if test="idCard != null and idCard != ''">id_card = #{idCard},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="workerType != null and workerType != ''">worker_type = #{workerType},</if>
+            <if test="entryDate != null">entry_date = #{entryDate},</if>
+            <if test="workStatus != null and workStatus != ''">work_status = #{workStatus},</if>
+            <if test="emergencyContact != null and emergencyContact != ''">emergency_contact = #{emergencyContact},</if>
+            <if test="emergencyPhone != null and emergencyPhone != ''">emergency_phone = #{emergencyPhone},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where worker_id = #{workerId}
+    </update>
+
+    <delete id="deleteWorkerById" parameterType="Long">
+        delete from sys_worker where worker_id = #{workerId}
+    </delete>
+
+    <delete id="deleteWorkerByIds" parameterType="Long">
+        delete from sys_worker where worker_id in
+        <foreach item="workerId" collection="array" open="(" separator="," close=")">
+            #{workerId}
+        </foreach>
+    </delete>
+</mapper>

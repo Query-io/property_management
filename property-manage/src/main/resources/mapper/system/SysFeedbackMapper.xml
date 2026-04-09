@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.SysFeedbackMapper">
+
+    <resultMap id="SysFeedbackResult" type="SysFeedback">
+        <id     property="id"             column="id"             />
+        <result property="userId"         column="user_id"        />
+        <result property="userName"       column="user_name"      />
+        <result property="contact"        column="contact"        />
+        <result property="content"        column="content"        />
+        <result property="replyContent"   column="reply_content"  />
+        <result property="replyUserId"    column="reply_user_id"  />
+        <result property="replyUserName"  column="reply_user_name"/>
+        <result property="replyTime"      column="reply_time"     />
+        <result property="createTime"     column="create_time"    />
+        <result property="updateTime"     column="update_time"    />
+        <result property="delFlag"        column="del_flag"       />
+    </resultMap>
+
+    <sql id="selectFeedbackVo">
+        SELECT id, user_id, user_name, contact, content, reply_content, reply_user_id, reply_user_name,
+               reply_time, create_time, update_time, del_flag
+        FROM sys_feedback
+    </sql>
+
+    <select id="selectSysFeedbackById" parameterType="Long" resultMap="SysFeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        WHERE id = #{id} AND del_flag = '0'
+    </select>
+
+    <select id="selectSysFeedbackList" parameterType="SysFeedback" resultMap="SysFeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        WHERE del_flag = '0'
+        <if test="userName != null and userName != ''">
+            AND user_name LIKE CONCAT('%', #{userName}, '%')
+        </if>
+        <if test="content != null and content != ''">
+            AND content LIKE CONCAT('%', #{content}, '%')
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            and date_format(create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            and date_format(create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+        </if>
+        <if test="userId != null and userId != ''">
+            and user_id = #{userId}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insertSysFeedback" parameterType="SysFeedback" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_feedback (
+            user_id, user_name, contact, content, reply_content,
+            reply_user_id, reply_user_name, reply_time, create_time, update_time, del_flag
+        ) VALUES (
+                     #{userId}, #{userName}, #{contact}, #{content}, #{replyContent},
+                     #{replyUserId}, #{replyUserName}, #{replyTime}, NOW(), NOW(), '0'
+                 )
+    </insert>
+
+    <update id="updateSysFeedback" parameterType="SysFeedback">
+        UPDATE sys_feedback
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="contact != null and contact != ''">contact = #{contact},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="replyContent != null and replyContent != ''">reply_content = #{replyContent},</if>
+            <if test="replyUserId != null">reply_user_id = #{replyUserId},</if>
+            <if test="replyUserName != null and replyUserName != ''">reply_user_name = #{replyUserName},</if>
+            <if test="replyTime != null">reply_time = #{replyTime},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteSysFeedbackById" parameterType="Long">
+        UPDATE sys_feedback SET del_flag = '1' WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteSysFeedbackByIds" parameterType="Long">
+        UPDATE sys_feedback SET del_flag = '1' WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

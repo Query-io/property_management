@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.system.mapper.OwnerPointsMapper">
+
+    <resultMap type="OwnerPoints" id="OwnerPointsResult">
+        <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="userId" column="user_id"/>
+        <result property="points" column="occupation" javaType="java.lang.Integer" jdbcType="VARCHAR" typeHandler="org.apache.ibatis.type.IntegerTypeHandler"/>
+        <result property="dateOfBirth" column="date_of_birth"/>
+        <result property="identityNo" column="identity_no"/>
+        <result property="address" column="address"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+    <sql id="selectOwnerPointsVo">
+        select
+        owner_id,
+        owner_name,
+        user_id,
+        occupation,  <!-- 保持原字段，通过类型处理器转换 -->
+        date_of_birth,
+        identity_no,
+        address,
+        phone_number,
+        create_time,
+        update_time,
+        create_by,
+        update_by
+        from sys_owner_info
+    </sql>
+
+    <select id="selectOwnerPointsList" parameterType="OwnerPoints" resultMap="OwnerPointsResult">
+        <include refid="selectOwnerPointsVo"/>
+        <where>
+            <if test="ownerName != null and ownerName != ''">
+                AND owner_name like concat('%', #{ownerName}, '%')
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                AND phone_number like concat('%', #{phoneNumber}, '%')
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="points != null">
+                AND occupation = #{points}  <!-- 直接比较字符串形式的数字 -->
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectUpdateTimeById" parameterType="Long" resultType="java.util.Date">
+        select update_time from sys_owner_info where owner_id = #{ownerId}
+    </select>
+
+    <select id="selectOwnerPointsById" parameterType="Long" resultMap="OwnerPointsResult">
+        <include refid="selectOwnerPointsVo"/>
+        where owner_id = #{ownerId}
+    </select>
+
+    <select id="selectOwnerPointsByUserId" parameterType="Long" resultMap="OwnerPointsResult">
+        <include refid="selectOwnerPointsVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertOwnerPoints" parameterType="OwnerPoints" useGeneratedKeys="true" keyProperty="ownerId">
+        insert into sys_owner_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ownerName != null and ownerName != ''">owner_name,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="points != null">occupation,</if>  <!-- 存储为字符串 -->
+            <if test="dateOfBirth != null">date_of_birth,</if>
+            <if test="identityNo != null and identityNo != ''">identity_no,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="phoneNumber != null and phoneNumber != ''">phone_number,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ownerName != null and ownerName != ''">#{ownerName},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="points != null">#{points},</if>  <!-- 自动转换为字符串 -->
+            <if test="dateOfBirth != null">#{dateOfBirth},</if>
+            <if test="identityNo != null and identityNo != ''">#{identityNo},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="phoneNumber != null and phoneNumber != ''">#{phoneNumber},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOwnerPoints" parameterType="OwnerPoints">
+        update sys_owner_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ownerName != null and ownerName != ''">owner_name = #{ownerName},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="points != null">occupation = #{points},</if>  <!-- 更新为字符串形式 -->
+            <if test="dateOfBirth != null">date_of_birth = #{dateOfBirth},</if>
+            <if test="identityNo != null and identityNo != ''">identity_no = #{identityNo},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="phoneNumber != null and phoneNumber != ''">phone_number = #{phoneNumber},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where owner_id = #{ownerId}
+    </update>
+
+<!--    &lt;!&ndash; 只更新积分字段 &ndash;&gt;-->
+<!--    <update id="updatePoints" parameterType="OwnerPoints">-->
+<!--        update sys_owner_info-->
+<!--        set-->
+<!--            occupation = #{points},-->
+<!--            update_by = #{updateBy},-->
+<!--            update_time = sysdate()-->
+<!--        where user_id = #{userId}-->
+<!--    </update>-->
+    <!-- 只更新积分字段 -->
+<!--    <update id="updatePoints" parameterType="OwnerPoints">-->
+<!--        update sys_owner_info-->
+<!--        set-->
+<!--            occupation = #{points},-->
+<!--            update_by = #{updateBy},-->
+<!--            update_time = sysdate()-->
+<!--        where user_id = #{userId}-->
+<!--    </update>-->
+
+    <!-- 修改 updatePoints 方法，使用 owner_id 而不是 user_id -->
+    <update id="updatePoints" parameterType="OwnerPoints">
+        update sys_owner_info
+        set
+        occupation = #{points},
+        update_by = #{updateBy},
+        update_time = sysdate()
+        where owner_id = #{ownerId}
+        <if test="updateTime != null">
+            and update_time = #{updateTime}
+        </if>
+    </update>
+
+    <!-- 添加带乐观锁的积分更新方法 -->
+    <update id="updatePointsWithLock" parameterType="OwnerPoints">
+        update sys_owner_info
+        set
+        occupation = #{points},
+        update_by = #{updateBy},
+        update_time = sysdate()
+        where owner_id = #{ownerId}
+        <if test="updateTime != null">
+            and update_time = #{updateTime}
+        </if>
+        <if test="updateTime == null">
+            and update_time is null
+        </if>
+    </update>
+
+    <delete id="deleteOwnerPointsById" parameterType="Long">
+        delete from sys_owner_info where owner_id = #{ownerId}
+    </delete>
+
+    <delete id="deleteOwnerPointsByIds" parameterType="Long">
+        delete from sys_owner_info where owner_id in
+        <foreach item="ownerId" collection="array" open="(" separator="," close=")">
+            #{ownerId}
+        </foreach>
+    </delete>
+</mapper>
